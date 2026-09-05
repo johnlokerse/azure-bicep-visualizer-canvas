@@ -1,3 +1,4 @@
 .DS_Store
 extension/artifacts/
-extension/vendor/
+extension/vendor/*
+!extension/vendor/NOTICE.md
