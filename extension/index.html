@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bicep Visualizer</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="shell.css">
+  <script type="module" src="shell.js"></script>
+</head>
+<body>
+  <header>
+    <strong>Bicep Visualizer</strong>
+    <button id="choose" title="Choose workspace and Bicep file">Open file</button>
+    <span id="filename">No file selected</span>
+    <button id="source" disabled>Source</button>
+    <button id="problems">Problems <span id="problem-count">0</span></button>
+    <button id="refresh" title="Refresh saved files">Refresh</button>
+    <label class="theme-label">Theme
+      <select id="theme" aria-label="Visualizer theme">
+        <option value="auto">App</option>
+        <option value="vscode-light">Light</option>
+        <option value="vscode-dark">Dark</option>
+        <option value="vscode-high-contrast">Dark high contrast</option>
+        <option value="vscode-high-contrast-light">Light high contrast</option>
+      </select>
+    </label>
+  </header>
+  <div id="notice" role="status" hidden></div>
+  <main>
+    <section id="picker">
+      <h1>Open a Bicep file</h1>
+      <p>The original Azure Bicep visualizer. Select an entrypoint to explore its resources and dependencies.</p>
+      <form id="workspace-form">
+        <label for="workspace">Workspace folder</label>
+        <div class="row"><input id="workspace" required autocomplete="off" spellcheck="false"><button>Browse</button></div>
+      </form>
+      <label for="filter">Find a Bicep file</label>
+      <input id="filter" type="search" placeholder="Filter by filename or path" autocomplete="off">
+      <p id="file-status" role="status"></p>
+      <div id="files" aria-label="Bicep files"></div>
+      <p class="muted">Saved changes update the graph automatically. Unsaved editor buffers are not shared with this canvas.</p>
+    </section>
+    <iframe id="graph" title="Bicep resource dependency graph" hidden></iframe>
+    <aside id="details" hidden>
+      <div class="details-header"><strong id="details-title">Source</strong><button id="close-details" aria-label="Close details">Close</button></div>
+      <div id="details-content"></div>
+    </aside>
+  </main>
+  <dialog id="save-dialog">
+    <form id="save-form">
+      <h2>Save PNG</h2>
+      <label for="export-name">Filename</label><input id="export-name" required pattern=".+\.png">
+      <label for="export-folder">Folder (optional)</label><input id="export-folder" placeholder="Canvas exports folder" spellcheck="false">
+      <p class="muted">Leave the folder blank to save in the canvas's persistent exports folder. Existing files are never overwritten.</p>
+      <div class="row"><button type="button" id="cancel-save">Cancel</button><button type="submit">Save</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

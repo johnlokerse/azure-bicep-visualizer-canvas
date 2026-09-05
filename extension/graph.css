@@ -1,0 +1,11 @@
+/* Preserve the upstream renderer while keeping export controls inside narrow side panels. */
+@media (max-width: 740px) {
+  body [data-testid="export-overlay"] {
+    width: max-content;
+    max-width: calc(100% - 32px);
+  }
+  body [data-testid="export-overlay"] [role="toolbar"] {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+}

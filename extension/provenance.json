@@ -1,0 +1,40 @@
+{
+  "name": "bicep-visualizer",
+  "scope": "user",
+  "upstream": "https://github.com/Azure/bicep",
+  "version": "v0.46.1",
+  "license": "MIT",
+  "release": "https://github.com/Azure/bicep/releases/tag/v0.46.1",
+  "rendererArchive": {
+    "url": "https://github.com/Azure/bicep/releases/download/v0.46.1/vscode-bicep.vsix",
+    "sha256": "497b3bc762af59a5ec6527f185e09042e97d8d48974d4b2df22fc4e2ac25f633",
+    "rendererPath": "extension/out/visual-designer",
+    "distribution": "Committed unchanged in vendor/renderer"
+  },
+  "languageServerArchive": {
+    "url": "https://github.com/Azure/bicep/releases/download/v0.46.1/bicep-langserver.zip",
+    "sha256": "b8224c8e941cde9698747ddd97c930a25097bf688e4e43e4acdd21ca8c24656a",
+    "languageServerPath": ".",
+    "distribution": "Downloaded and verified during installation"
+  },
+  "renderer": "Unmodified out/visual-designer bundle from ms-azuretools.vscode-bicep-0.46.1",
+  "languageServer": "Unmodified bicepLanguageServer from the same release",
+  "sourcePaths": [
+    "src/vscode-bicep-ui/apps/visual-designer",
+    "src/vscode-bicep-ui/packages/components",
+    "src/vscode-bicep-ui/packages/messaging",
+    "src/vscode-bicep/src/visualizer/view.ts",
+    "src/vscode-bicep/src/visualizer/viewManager.ts",
+    "src/Bicep.LangServer/Features/Custom/Visualization"
+  ],
+  "requirements": [".NET 10 runtime (dotnet on PATH)"],
+  "adaptations": [
+    "VS Code postMessage replaced by capability-protected loopback HTTP and SSE",
+    "Source and Problems shown in a canvas details pane; source can also open in VS Code",
+    "Save As uses a canvas dialog with a destination folder and exclusive PNG creation",
+    "Live updates follow saved files; unsaved editor buffers are not accessible",
+    "Workspace entrypoint selection persists by canonical workspace path",
+    "Graph interactions and export controls remain the original upstream implementation",
+    "Export toolbar wraps in narrow canvas panels without changing its controls"
+  ]
+}
