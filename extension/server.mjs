@@ -1,13 +1,15 @@
 import { createServer } from "node:http";
 import { randomBytes, createHash } from "node:crypto";
 import { readFile, writeFile, readdir, realpath, stat, mkdir } from "node:fs/promises";
+import { homedir } from "node:os";
 import { dirname, resolve, relative, isAbsolute, extname, join, basename } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { BicepLanguageServer } from "./language-server.mjs";
 
 const home = dirname(fileURLToPath(import.meta.url));
-const artifacts = join(home, "artifacts");
-const renderer = join(home, "vendor", "renderer");
+const copilotHome = process.env.COPILOT_HOME ?? join(homedir(), ".copilot");
+const defaultArtifacts = resolve(process.env.BICEP_VISUALIZER_STATE ?? join(copilotHome, "state", "bicep-visualizer"));
+const defaultRenderer = process.env.BICEP_VISUALIZER_RENDERER_PATH ?? join(home, "vendor", "renderer");
 const ignored = new Set([".git", "node_modules", ".terraform", "bin", "obj", "vendor"]);
 const mime = { ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
 const inside = (root, path) => {
@@ -26,9 +28,14 @@ async function body(req, limit = 8 * 1024 * 1024) {
   return Buffer.concat(parts);
 }
 
-export async function startCanvas(input = {}) {
+export async function startCanvas(input = {}, {
+  artifacts = defaultArtifacts,
+  rendererPath = defaultRenderer,
+  serverPath = process.env.BICEP_VISUALIZER_SERVER_PATH,
+} = {}) {
   let rootPath = await realpath(resolve(input.rootPath ?? (input.filePath && isAbsolute(input.filePath) ? dirname(input.filePath) : process.cwd())));
   if (!(await stat(rootPath)).isDirectory()) throw new Error("rootPath must be a directory.");
+  const rendererRoot = await realpath(rendererPath);
   let filePath = null;
   let language = null;
   let languageStart = null;
@@ -65,7 +72,9 @@ export async function startCanvas(input = {}) {
   }
   async function ensureLanguage() {
     if (!languageStart) {
-      language = new BicepLanguageServer({ rootPath, onDiagnostics: invalidated, onChange: invalidated, onError: failure });
+      language = new BicepLanguageServer({
+        rootPath, serverPath, onDiagnostics: invalidated, onChange: invalidated, onError: failure,
+      });
       languageStart = language.start();
     }
     await languageStart;
@@ -253,8 +262,8 @@ export async function startCanvas(input = {}) {
       let target;
       if (Object.hasOwn(names, route)) target = join(home, names[route]);
       else if (route.startsWith("renderer/")) {
-        target = await realpath(resolve(renderer, route.slice("renderer/".length)));
-        if (!inside(renderer, target)) throw new Error("Invalid asset path.");
+        target = await realpath(resolve(rendererRoot, route.slice("renderer/".length)));
+        if (!inside(rendererRoot, target)) throw new Error("Invalid asset path.");
       } else { json(res, { error: "Not found." }, 404); return; }
       res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'");
       res.setHeader("Content-Type", mime[extname(target)] ?? "text/html; charset=utf-8");

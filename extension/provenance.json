@@ -9,16 +9,17 @@
     "url": "https://github.com/Azure/bicep/releases/download/v0.46.1/vscode-bicep.vsix",
     "sha256": "497b3bc762af59a5ec6527f185e09042e97d8d48974d4b2df22fc4e2ac25f633",
     "rendererPath": "extension/out/visual-designer",
-    "distribution": "Committed unchanged in vendor/renderer"
+    "distribution": "Committed unchanged in two flat text bundles and reconstructed into the external Copilot cache"
   },
   "languageServerArchive": {
     "url": "https://github.com/Azure/bicep/releases/download/v0.46.1/bicep-langserver.zip",
     "sha256": "b8224c8e941cde9698747ddd97c930a25097bf688e4e43e4acdd21ca8c24656a",
     "languageServerPath": ".",
-    "distribution": "Downloaded and verified during installation"
+    "distribution": "Downloaded and verified into the external Copilot cache on first launch"
   },
   "renderer": "Unmodified out/visual-designer bundle from ms-azuretools.vscode-bicep-0.46.1",
   "languageServer": "Unmodified bicepLanguageServer from the same release",
+  "thirdPartyNotices": "https://github.com/johnlokerse/azure-bicep-visualizer-canvas/blob/main/ThirdPartyNotices.txt",
   "sourcePaths": [
     "src/vscode-bicep-ui/apps/visual-designer",
     "src/vscode-bicep-ui/packages/components",

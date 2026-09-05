@@ -1,0 +1,11 @@
+{
+  "name": "bicep-visualizer-canvas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Azure Bicep v0.46.1 resource graph canvas for the GitHub Copilot app",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}

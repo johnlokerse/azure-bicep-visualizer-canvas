@@ -23,9 +23,9 @@ try {
         $sourceRoot = (Get-ChildItem -LiteralPath $work -Directory | Select-Object -First 1).FullName
     }
 
-    $bootstrap = Join-Path $sourceRoot "scripts\bootstrap-vendor.ps1"
-    if (-not (Test-Path (Join-Path $sourceRoot "extension\extension.mjs")) -or -not (Test-Path $bootstrap)) {
-        throw "The downloaded source is missing the extension or bootstrap script."
+    if (-not (Test-Path (Join-Path $sourceRoot "extension\extension.mjs")) `
+        -or -not (Test-Path (Join-Path $sourceRoot "extension\bootstrap.mjs"))) {
+        throw "The downloaded source is missing the canvas extension."
     }
 
     $copilotHome = if ($env:COPILOT_HOME) { $env:COPILOT_HOME } else { Join-Path $HOME ".copilot" }
@@ -43,34 +43,17 @@ try {
     }
     $stage = Join-Path $parent (".bicep-visualizer.install." + [Guid]::NewGuid())
     New-Item -ItemType Directory -Path $stage | Out-Null
-    $files = @(
-        "extension.mjs", "server.mjs", "language-server.mjs",
-        "bridge.js", "shell.js", "index.html", "graph.html", "graph.css", "shell.css",
-        "copilot-extension.json", "provenance.json"
-    )
-    foreach ($file in $files) {
-        Copy-Item -Force (Join-Path $sourceRoot "extension\$file") (Join-Path $stage $file)
+    $payload = Get-ChildItem -LiteralPath (Join-Path $sourceRoot "extension") -Force
+    if ($payload.Where({ -not $_.PSIsContainer }).Count -ne $payload.Count) {
+        throw "The extension payload must contain only top-level text files."
     }
-    New-Item -ItemType Directory -Path (Join-Path $stage "examples"), (Join-Path $stage "vendor") | Out-Null
-    Copy-Item -Recurse -Force (Join-Path $sourceRoot "extension\examples\*") (Join-Path $stage "examples")
-    Copy-Item -Recurse -Force (Join-Path $sourceRoot "extension\vendor\renderer") (Join-Path $stage "vendor\renderer")
-    Copy-Item -Force `
-        (Join-Path $sourceRoot "extension\vendor\LICENSE.txt"), `
-        (Join-Path $sourceRoot "extension\vendor\ThirdPartyNotices.txt"), `
-        (Join-Path $sourceRoot "extension\vendor\language-server.sha256") `
-        (Join-Path $stage "vendor")
+    Copy-Item -Force $payload.FullName $stage
 
     if (Test-Path (Join-Path $target "artifacts")) {
-        New-Item -ItemType Directory -Path (Join-Path $stage "artifacts") | Out-Null
-        Copy-Item -Recurse -Force (Join-Path $target "artifacts\*") (Join-Path $stage "artifacts")
+        $legacyState = if ($env:BICEP_VISUALIZER_STATE) { $env:BICEP_VISUALIZER_STATE } else { Join-Path $copilotHome "state\bicep-visualizer" }
+        New-Item -ItemType Directory -Force -Path $legacyState | Out-Null
+        Copy-Item -Recurse -Force (Join-Path $target "artifacts\*") $legacyState
     }
-    if ((Test-Path (Join-Path $target "vendor\.installed-bicep-langserver.json")) `
-        -and (Test-Path (Join-Path $target "vendor\language-server"))) {
-        Copy-Item -Recurse -Force (Join-Path $target "vendor\language-server") (Join-Path $stage "vendor\language-server")
-        Copy-Item -Force (Join-Path $target "vendor\.installed-bicep-langserver.json") (Join-Path $stage "vendor\.installed-bicep-langserver.json")
-    }
-
-    & $bootstrap -Target $stage
 
     $backup = Join-Path $parent (".bicep-visualizer.backup." + [Guid]::NewGuid())
     if (Test-Path $target) {
@@ -90,7 +73,7 @@ try {
 
     Write-Host ""
     Write-Host "Installed Bicep Visualizer at $target"
-    Write-Host "Reload extensions in GitHub Copilot, or restart the app."
+    Write-Host "Reload extensions in GitHub Copilot, or restart the app. The first launch downloads the pinned Azure Bicep runtime."
 } finally {
     if ($backup -and (Test-Path $backup) -and -not (Test-Path $target)) {
         Move-Item -LiteralPath $backup -Destination $target

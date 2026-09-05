@@ -1,7 +1,14 @@
 import { joinSession, createCanvas, CanvasError } from "@github/copilot-sdk/extension";
+import { ensureBicepRuntime } from "./bootstrap.mjs";
 import { startCanvas } from "./server.mjs";
 
 const panels = new Map();
+let runtimeError;
+const runtimeReady = ensureBicepRuntime().catch((error) => {
+  runtimeError = error;
+  console.error(error.message);
+  return null;
+});
 const object = (properties = {}, required = []) => ({
   type: "object", properties, required, additionalProperties: false,
 });
@@ -48,9 +55,11 @@ await joinSession({
       },
     ],
     open: async (ctx) => {
+      const runtime = await runtimeReady;
+      if (!runtime) throw new CanvasError("runtime_setup_failed", runtimeError.message);
       let entry = panels.get(ctx.instanceId);
       if (!entry) {
-        entry = await startCanvas(ctx.input ?? {});
+        entry = await startCanvas(ctx.input ?? {}, runtime);
         panels.set(ctx.instanceId, entry);
       }
       return { title: "Bicep Visualizer", url: entry.url };

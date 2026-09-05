@@ -1,4 +1,3 @@
 .DS_Store
 extension/artifacts/
-extension/vendor/.installed-bicep-langserver.json
-extension/vendor/language-server/
+extension/vendor/

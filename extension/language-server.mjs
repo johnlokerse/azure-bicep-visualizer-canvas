@@ -51,7 +51,7 @@ export class BicepLanguageServer {
   constructor({
     rootPath, onDiagnostics, onChange, onError,
     dotnetPath = process.env.BICEP_VISUALIZER_DOTNET ?? "dotnet",
-    serverPath = join(extensionPath, "vendor/language-server/Bicep.LangServer.dll"),
+    serverPath = process.env.BICEP_VISUALIZER_SERVER_PATH ?? join(extensionPath, "vendor/language-server/Bicep.LangServer.dll"),
     requestTimeout = 60000, pollInterval = 1000,
   } = {}) {
     if (!rootPath) throw new Error("BicepLanguageServer requires rootPath");
