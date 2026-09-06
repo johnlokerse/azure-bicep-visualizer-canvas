@@ -16,19 +16,6 @@ extension. On first launch, the extension downloads Microsoft's official 55 MB
 `bicep-langserver.zip`, verifies its pinned SHA-256 and a complete 241-file
 checksum manifest, then installs it into an external Copilot cache.
 
-## Prerequisites
-
-- GitHub Copilot app with canvas extensions and **Import canvas from gist/URL**.
-- [.NET 10 runtime](https://dotnet.microsoft.com/download/dotnet/10.0), with
-  `dotnet` on `PATH`.
-- Network access to the official Azure Bicep v0.46.1 release on GitHub during
-  first launch.
-- macOS or Linux: `unzip`.
-- Windows: built-in `tar` or Windows PowerShell.
-
-Set `BICEP_VISUALIZER_DOTNET` to an absolute `dotnet` executable path when
-`dotnet` is not on `PATH`.
-
 ## Import directly in the GitHub Copilot app
 
 Use this repository folder URL:
@@ -48,20 +35,6 @@ The extension follows GitHub's documented direct-installed layout: its own
 directory contains [`package.json`](extension/package.json),
 [`extension.mjs`](extension/extension.mjs), the local UI, licenses, provenance,
 and renderer text assets.
-
-## Usage
-
-Ask Copilot to open the Bicep Visualizer for a workspace or entrypoint:
-
-> Open the Bicep Visualizer for `infra/main.bicep`.
-
-The canvas can also open a workspace and let you select an entrypoint. Changes
-saved to `.bicep`, `.bicepparam`, and `bicepconfig.json` files update the graph
-automatically. Unsaved editor buffers are not visible to the extension.
-
-PNG exports default to the external canvas state directory. You can choose
-another absolute local directory in the save dialog; existing files are never
-overwritten.
 
 ## Licensing and attribution
 
